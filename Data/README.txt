@@ -13,7 +13,8 @@ Need to make a .env file in root directory in this style since the github is pub
     DB_HOST=localhost
     DB_NAME=books_proj_db // can be named anything you want    
 
-Download all data csv files used from googledrive 
+Download books_1.Best_Books_Ever.csv as main data file used from googledrive
+Other files are there if extra data is wanted 
 Put them in Data folder
 https://drive.google.com/drive/folders/1Caobhx38DKTPC_wno7G9A5Ywrnf1MpBQ?usp=sharing       
 

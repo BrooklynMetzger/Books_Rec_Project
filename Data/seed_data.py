@@ -6,7 +6,6 @@ from langdetect import detect, DetectorFactory
 from langdetect.lang_detect_exception import LangDetectException
 from dotenv import load_dotenv
 
-
 load_dotenv()
 DetectorFactory.seed = 0  
 
@@ -25,7 +24,7 @@ def extract_value(row, possible_columns, default_val):
             return str(row[col]).strip()
     return default_val
 
-def run_master_importer(csv_filename):
+def seed_database(csv_filename):
     print("Connecting to PostgreSQL...")
     conn = psycopg2.connect(
         dbname=os.getenv("DB_NAME"),
@@ -149,10 +148,15 @@ def run_master_importer(csv_filename):
 
 if __name__ == "__main__":
     print("Seeding Database with 4 csv files.")
-    run_master_importer("books_1.Best_Books_Ever.csv")
-    print("book1.Best_Books_Ever down next google_books")
-    run_master_importer("google_books_dataset.csv")
-    print("Google done next books")
-    run_master_importer("books.csv")
-    print("books done time for data")
-    run_master_importer("data.csv")
+    seed_database("books_1.Best_Books_Ever.csv")
+
+    # books_1.Best_Books_Ever.csv is the largest source of data
+    # The other calls are there if you would like to add more data
+    # Just download them then uncomment the calls below
+
+    #print("book1.Best_Books_Ever down next google_books")
+    #seed_database("google_books_dataset.csv")
+    #print("Google done next books")
+    #seed_database("books.csv")
+    #print("books done time for data")
+    #seed_database("data.csv")
