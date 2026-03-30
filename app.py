@@ -1,15 +1,29 @@
 from flask import Flask, render_template, request
 import psycopg2
 
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
 app = Flask(__name__)
 
-DB_USER = "my_app_user"
-DB_PASS = "books" # actual password
-DB_HOST = "localhost"
-DB_NAME = "books_proj_db" 
+env_path = Path(__file__).resolve().parent / ".env"
+load_dotenv(dotenv_path=env_path, override=True)
+
+DB_USER = os.getenv("DB_USER")
+DB_PASS = os.getenv("DB_PASS")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
 
 def get_db_connection():
-    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+    conn = psycopg2.connect(
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASS,
+        host=DB_HOST,
+        port=DB_PORT
+    )
     return conn
 
 @app.route('/', methods=['GET', 'POST'])
