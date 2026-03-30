@@ -9,12 +9,13 @@ load_dotenv()
 DB_USER = os.getenv("DB_USER")
 DB_PASS = os.getenv("DB_PASS")
 DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
 DB_NAME = os.getenv("DB_NAME")
 
 def setup_database():
     try:
         #Connect to the default 'postgres' database first to create our app database
-        conn = psycopg2.connect(dbname="postgres", user=DB_USER, password=DB_PASS, host=DB_HOST)
+        conn = psycopg2.connect(dbname="postgres", user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT)
         conn.autocommit = True
         cursor = conn.cursor()
 
@@ -29,7 +30,7 @@ def setup_database():
         conn.close()
 
         #Now connect to actual project database to create tables
-        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT)
         cursor = conn.cursor()
 
         print("Creating tables...")
