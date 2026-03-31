@@ -11,6 +11,7 @@ Need to make a .env file in root directory in this style since the github is pub
     DB_USER=your_postgres_username  // update both USER and PASS fields
     DB_PASS=your_postgres_password // with your username and password
     DB_HOST=localhost
+    DB_PORT=5433 //or whatever your port number is
     DB_NAME=books_proj_db // can be named anything you want    
 
 Download books_1.Best_Books_Ever.csv as main data file used from googledrive

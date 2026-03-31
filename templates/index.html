@@ -9,6 +9,11 @@
         .search-container { text-align: center; margin-bottom: 30px; }
         input[type="text"] { padding: 10px; width: 300px; font-size: 16px; }
         button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+
+        /*user info bar*/
+        .user-bar { text-align: right; margin-bottom: 10px; font-size: 14px; color: #555; }
+        .user-bar a { color: #333; text-decoration: none; margin-left: 10px; }
+        .user-bar a:hover {text-decoration: underline;}
         
         .results-grid {
             display: grid;
@@ -31,6 +36,11 @@
     </style>
 </head>
 <body>
+    <!--show logged in userID with logout link-->
+    <div class="user-bar">
+        Logged in as: <strong>{{ user_id }}</strong>
+        <a href="/logout">Logout</a>
+    </div>
 
     <div class="search-container">
         <h1>Search for a Book</h1>
