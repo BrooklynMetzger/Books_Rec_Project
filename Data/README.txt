@@ -12,7 +12,8 @@ Need to make a .env file in root directory in this style since the github is pub
     DB_PASS=your_postgres_password // with your username and password
     DB_HOST=localhost
     DB_PORT=5433 //or whatever your port number is
-    DB_NAME=books_proj_db // can be named anything you want    
+    DB_NAME=books_proj_db // can be named anything you want  
+    SECRET_KEY=dev-secret-key //for flask to work, not for data seeding
 
 Download books_1.Best_Books_Ever.csv as main data file used from googledrive
 Other files are there if extra data is wanted 
