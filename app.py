@@ -38,7 +38,7 @@ def login():
             conn = get_db_connection()
             cursor = conn.cursor()
 
-            cursor.execute("SELECT UserID FROm \"User\" WHERE UserID = %s;", (user_id,))
+            cursor.execute("SELECT UserID FROM \"User\" WHERE UserID = %s;", (user_id,))
             user = cursor.fetchone()
 
             if user:
@@ -57,9 +57,20 @@ def login():
         
     return render_template('login.html')
 
+#logout routing
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    return redirect(url_for('login'))
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+
+    #send back to login if a user is not logged in
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
     books = []
     search_query = ""
 
@@ -84,7 +95,7 @@ def index():
             cursor.close()
             conn.close()
 
-    return render_template('index.html', books=books, search_query=search_query)
+    return render_template('index.html', books=books, search_query=search_query, user_id=session['user_id'])
 
 if __name__ == '__main__':
     # Runs the app in debug mode on port 5000
