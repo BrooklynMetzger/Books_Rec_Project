@@ -18,6 +18,8 @@ DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
 DB_NAME = os.getenv("DB_NAME")
 
+ADMIN_ID = "admin"
+
 def get_db_connection():
     conn = psycopg2.connect(
         dbname=DB_NAME,
@@ -100,8 +102,9 @@ def index():
 #admin page
 @app.route('/add_book', methods=['POST'])
 def add_book():
-    if 'user_id' not in session:
-        return jsonify({"error": "unauthorized"}), 401
+    if session.get('user_id') != ADMIN_ID:
+        return jsonify({"error": "Unauthorized. Admin access only"}), 403
+        
     conn = None
     cursor = None
     data = request.get_json()
@@ -137,7 +140,7 @@ def add_book():
 
 @app.route('/admin')
 def admin_page():
-    if 'user_id' not in session:
+     if session.get('user_id') != ADMIN_ID:
         return redirect(url_for('login'))
     return render_template('admin.html')
 
