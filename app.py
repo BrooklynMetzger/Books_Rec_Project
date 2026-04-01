@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 import psycopg2
 import os
 from pathlib import Path
@@ -96,6 +96,51 @@ def index():
             conn.close()
 
     return render_template('index.html', books=books, search_query=search_query, user_id=session['user_id'])
+
+#admin page
+@app.route('/add_book', methods=['POST'])
+def add_book():
+    if 'user_id' not in session:
+        return jsonify({"error": "unauthorized"}), 401
+    conn = None
+    cursor = None
+    data = request.get_json()
+
+    isbn = data.get('isbn')
+    title = data.get('title')
+    author = data.get('author')
+    genre = data.get('genre')
+    language = data.get('language')
+    pages= data.get('pages')
+    date_published = data.get('date')
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(""" 
+                    INSERT INTO Book (ISBN, Title, Author, Genre, Language, Pages, DatePublished) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s);
+                    """, (isbn, title, author, genre, language, pages, date_published))
+        
+        conn.commit()
+        return jsonify({"message" : "Book added"}), 200
+    except Exception as ex:
+        if conn:
+            conn.rollback()
+        return jsonify({"error": str(ex)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@app.route('/admin')
+def admin_page():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('admin.html')
+
 
 if __name__ == '__main__':
     # Runs the app in debug mode on port 5000
