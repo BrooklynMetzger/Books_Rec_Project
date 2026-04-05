@@ -140,7 +140,7 @@ def add_book():
 
 @app.route('/admin')
 def admin_page():
-     if session.get('user_id') != ADMIN_ID:
+    if session.get('user_id') != ADMIN_ID:
         return redirect(url_for('login'))
     return render_template('admin.html')
 
