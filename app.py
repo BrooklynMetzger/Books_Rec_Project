@@ -150,6 +150,28 @@ def saved_books():
     conn.close()
     return render_template('saved_books.html', books=books, user_id=user_id)
 
+#delete book from saves route
+@app.route('/delete_book', methods=['POST'])
+def delete_book():
+    if 'user_id' not in session:
+        return jsonify({"error": "Not logged in"}), 401
+    data = request.get_json()
+    isbn = data.get('isbn')
+    user_id = session['user_id']
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM Saves WHERE UserID = %s AND ISBN = %s;", (user_id, isbn))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Removed"}), 200
+    except Exception as ex:
+        return jsonify({"error": str(ex)}), 500
+
+
+
 #save book route
 @app.route('/save_book', methods=['POST'])
 def save_book():

@@ -30,6 +30,17 @@
             margin-bottom: 10px;
         }
         .no-books { text-align: center; color: #555; margin-top: 40px; font-size: 16px; }
+        .delete-btn {
+            margin-top: 8px;
+            padding: 6px 14px;
+            font-size: 13px;
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {background-color: #b52b27;}
     </style>
 </head>
 <body>
@@ -52,11 +63,28 @@
                     {% endif %}
                     <h3>{{ book[0] }}</h3>
                     <p><i>{{ book[1] }}</i></p>
+                    <button class"delete-btn" onclick="deleteBook('{{ book[3] }}', this)">Remove</button>
                 </div>
             {% endfor %}
         </div>
     {% else %}
         <p class="no-books">No books have been saved. Search books and click on save to add them here.</p>
-    {% endif %}
+    {% endif %} <script>
+        function deleteBook(isbn, btn){
+            fetch('/delete_book', {
+                method: 'POST',
+                headers: { 'Content-TYpe': 'application/json'},
+                body: JSON.stringify({ isbn: isbn })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.message){
+                    btn.closest('.book-card').remove();
+                } else {
+                    alert(data.error);
+                }
+            });
+        }
+    </script>
 </body>
 </html>
