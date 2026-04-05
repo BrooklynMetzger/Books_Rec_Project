@@ -18,7 +18,10 @@ DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
 DB_NAME = os.getenv("DB_NAME")
 
-ADMIN_ID = "admin"
+ADMIN_ID = "0000"
+
+#genres for filter drop down
+GENRES = ["Fiction", "Non-Fiction", "Thriller", "Romance", "Fantasy", "Horror", "Mystery", "Science Fiction", "Biography"]
 
 def get_db_connection():
     conn = psycopg2.connect(
@@ -59,6 +62,20 @@ def login():
         
     return render_template('login.html')
 
+#separate route for admin login box
+@app.route('/admin_login', methods=['POST'])
+def admin_login():
+    admin_id = request.form.get('admin_id', '').strip()
+
+    if admin_id == ADMIN_ID:
+        session['user_id'] = ADMIN_ID
+        return redirect(url_for('admin_page'))
+    else:
+        #incorrect id
+        return redirect(url_for('login'))
+    
+
+
 #logout routing
 @app.route('/logout')
 def logout():
@@ -75,29 +92,106 @@ def index():
     
     books = []
     search_query = ""
+    author_query = ""
+    genre_query = ""
 
     if request.method == 'POST':
-        search_query = request.form.get('search_query', '')
+        search_query = request.form.get('search_query', '').strip()
+        author_query = request.form.get('author_query', '').strip()
+        genre_query = request.form.get('genre_query', '').strip()
+
+        #dynamically build the query using filled in filters
+        conditions = []
+        params = []
+
         
         if search_query:
+            conditions.append("Title ILIKE %s")
+            params.append(f"%{search_query}%")
+        if author_query:
+            conditions.append("Author ILIKE %s")
+            params.append(f"%{author_query}%")
+        if genre_query:
+            conditions.append("Genre ILIKE %s")
+            params.append(f"%{genre_query}%")
+        if conditions: 
+            where_clause = "WHERE " + " AND ".join(conditions)
+            sql = f"SELECT Title, Author, Thumbnail, ISBN FROM Book {where_clause} LIMIT 12;"
+
             conn = get_db_connection()
             cursor = conn.cursor()
-            
-            # ILIKE allows for case-insensitive searching. 
-            # % are wildcards
-            cursor.execute("""
-                SELECT Title, Author, Thumbnail 
-                FROM Book 
-                WHERE Title ILIKE %s 
-                LIMIT 12;
-            """, (f"%{search_query}%",))
-            
+            cursor.execute(sql, tuple(params))
             books = cursor.fetchall()
-            
             cursor.close()
             conn.close()
+            
 
-    return render_template('index.html', books=books, search_query=search_query, user_id=session['user_id'])
+    return render_template('index.html', books=books, 
+            search_query=search_query, author_query=author_query, 
+            genre_query=genre_query, genres=GENRES, user_id=session['user_id'])
+
+#saved books routing
+@app.route('/saved_books')
+def saved_books():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT b.Title, b.Author, b.Thumbnail, b.ISBN
+        FROM Book b
+        JOIN Saves s ON b.ISBN = s.ISBN
+        WHERE s.UserID = %s;
+    """, (user_id,))
+    books = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('saved_books.html', books=books, user_id=user_id)
+
+#save book route
+@app.route('/save_book', methods=['POST'])
+def save_book():
+    if 'user_id' not in session:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    data = request.get_json()
+    isbn = data.get('isbn')
+    user_id = session['user_id']
+
+    if not isbn:
+        return jsonify({"error": "ISBN not provided"}), 400
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "SELECT 1 FROM Saves WHERE UserID = %s AND ISBN = %s;",
+            (user_id, isbn)
+        )
+        already_saved = cursor.fetchone()
+        if already_saved:
+            cursor.close()
+            conn.close()
+            return jsonify({"error": "Book already saved"}), 200
+        
+        #ensure user exists in user table
+        cursor.execute("SELECT 1 FROM \"User\" WHERE UserID = %s;", (user_id,))
+        if not cursor.fetchone():
+            cursor.execute("INSERT INTO \"User\" (UserID) VALUES (%s);", (user_id,))
+            
+        cursor.execute(
+             "INSERT INTO Saves (UserID, ISBN) VALUES (%s, %s);",
+                (user_id, isbn)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Saved"}), 200
+    except Exception as ex:
+        return jsonify({"error": str(ex)}), 500
+        
 
 #admin page
 @app.route('/add_book', methods=['POST'])

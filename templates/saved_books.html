@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Books</title>
+    <style>
+        body {font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9; }
+        .user-bar { text-align: right; margin-bottom: 10px; font-size: 14px; color: #555; }
+        .user-bar a { color: #333; text-decoration: none; margin-left: 10px}
+        .user-bar a:hover {text-decoration: underline; }
+
+        h1 { text-align: center; margin-bottom: 30px; }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .book-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .book-cover {
+            max-width: 100%;
+            height: 200px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+        .no-books { text-align: center; color: #555; margin-top: 40px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div class="user-bar">
+        Logged in as: <strong>{{ user_id }}</strong>
+        <a href="/">Search Books</a>
+        <a href="/logout">Logout</a>
+    </div>
+    <h1>Your Saved Books</h1>
+    {% if books %}
+        <div class="results-grid">
+            {% for book in books %}
+                <div class="book-card">
+                    {% if book[2] %}
+                        <img src="{{ book[2] }}" alt="Cover of {{ book[0] }}" class="book-cover">
+                    {% else %}
+                        <div class="book-cover" style="background: #e0e0e0; display: flex; align-items: center; justify-content: center;">
+                            <p>No Cover found</p>
+                        </div>
+                    {% endif %}
+                    <h3>{{ book[0] }}</h3>
+                    <p><i>{{ book[1] }}</i></p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-books">No books have been saved. Search books and click on save to add them here.</p>
+    {% endif %}
+</body>
+</html>
