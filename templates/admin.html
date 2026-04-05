@@ -2,9 +2,19 @@
 <html>
 <head>
 <title>Book Database Admin</title>
+<style>
+    .user-bar { text-align: right; margin-bottom: 10px; font-size: 14px; color: #555; }
+    .user-bar a {color: #333; text-decoration: none; margin-left: 10px; }
+    .user-bar a:hover { text-decoration: underline;} 
+</style>
 </head>
 
 <body>
+<div class="user-bar">
+    Admin
+    <a href="/logout">Logout</a>
+</div>
+
 <h1>Add a book</h1>
 <form id = "addBookForm">
 <label>ISBN:</label>
