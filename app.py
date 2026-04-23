@@ -406,6 +406,32 @@ def add_book():
             cursor.close()
         if conn:
             conn.close()
+@app.route('/update_book', methods=['POST'])
+def update_book():
+    if session.get('user_id') != ADMIN_ID:
+        return jsonify({"error": "ONLY ADMIN ACCESS"}), 403
+    data = request.get_json()
+    isbn = data.get('isbn')
+    title = data.get('title')
+    author = data.get('author')
+    genre=data.get('genre')
+    language = data.get('language')
+    pages = data.get('pages')
+    date_published = data.get('date')
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE Book SET Title=%s, Author=%s, Genre=%s, Language=%s, Pages=%s, DatePublished=%s
+            WHERE ISBN=%s;
+        """, (title, author, genre, language, pages, date_published, isbn))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Book has been updated"}), 200
+    except Exception as ex:
+        return jsonify({"error": str(ex)}), 500
 
 @app.route('/admin')
 def admin_page():

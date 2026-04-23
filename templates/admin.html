@@ -40,6 +40,33 @@
 <input type="date" id="date" required><br><br>
 <button type="submit">Add Book</button>
 </form>
+<hr>
+<h1>Update Book</h1>
+<form id="updateBookForm">
+    <label>ISBN:</label>
+    <input type="text" id="u_isbn" required><br><br>
+    <label>New Title:</label>
+    <input type="text" id="u_title" required><br><br>
+    <label>New Author:</label>
+    <input type="text" id="u_author" required><br><br>
+    <label>New Genre:</label>
+    <select id="u_genre" required>
+        <option value="Fiction">Fiction</option>
+        <option value="Non-Fiction">Non-Fiction</option>
+        <option value="Thriller">Thriller</option>
+        <option value="Romance">Romance</option>
+        <option value="Fantasy">Fantasy</option>
+        <option value="Horror">Horror</option>
+    </select><br><br>
+    <label>New Language:</label>
+    <input type="text" id="u_language" required><br><br>
+    <label>New Pages:</label>
+    <input type="number" id="u_pages" required><br><br>
+    <label>New Date of Publication:</label>
+    <input type="date" id="u_date" required><br><br>
+    <button type="submit">Update Book</button>
+    <p id="update-msg"></p>
+</form>
 
 <script src="{{url_for ('static', filename = 'js/admin.js') }}"></script>
 </body>
